@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ℕ">
+<head>
+    <meta charset="UTF-8">
+    <title>ⓝ1337</title>
+    <style>
+        body {
+            background-color: #000;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: monospace;
+        }
+
+        #main-symbol {
+            font-size: 15rem;
+            color: #181818; 
+            user-select: none;
+        }
+
+        #input-wrapper {
+            position: fixed;
+            bottom: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #overflow-display {
+            visibility: hidden;
+            background: #111;
+            padding: 5px 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            color: #fff;
+            border: 1px solid #333;
+            font-size: 1.2rem;
+        }
+
+        #input-container {
+            background: #0d0d0d;
+            padding: 10px 20px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            font-size: 1.2rem;
+            color: #666;
+            border: 1px solid #1a1a1a;
+            white-space: nowrap;
+        }
+
+        .editable {
+            color: #eee;
+            outline: none;
+            padding: 0 2px;
+            min-width: 10px;
+            display: inline-block;
+            vertical-align: text-bottom;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .editable-text {
+            border-bottom: 1px dashed #444;
+        }
+
+        select.editable {
+            background: transparent;
+            border: none;
+            border-bottom: 1px dashed #444;
+            font-family: inherit;
+            font-size: inherit;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+
+        select.editable option {
+            background: #0d0d0d;
+            color: #eee;
+        }
+
+        .static {
+            color: #444;
+        }
+
+        #cursor {
+            width: 8px;
+            height: 18px;
+            background: #eee;
+            margin-left: 5px;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink { 50% { opacity: 0; } }
+
+        #enter-btn { 
+            margin-left: 15px; 
+            cursor: pointer; 
+            color: #fff; 
+            user-select: none;
+        }
+    </style>
+</head>
+<body>
+
+<div id="main-symbol">ℕ</div>
+
+<div id="input-wrapper">
+    <div id="overflow-display"></div>
+    <div id="input-container">
+        <span class="static">∆\ </span>
+        <span id="sub" class="editable editable-text" contenteditable="true" spellcheck="false">www</span>
+        <span class="static">.1337.</span>
+        <select id="ext" class="editable">
+            <option value="nexus" selected>nexus</option>
+            <option value="army">army</option>
+            <option value="vision">vision</option>
+            <option value="укр">укр</option>
+        </select>
+        <span class="static">/</span>
+        <span id="path" class="editable editable-text" contenteditable="true" spellcheck="false"></span>
+        <div id="cursor"></div>
+        <div id="enter-btn">↵</div>
+    </div>
+</div>
+
+<script>
+    const sub = document.getElementById('sub');
+    const path = document.getElementById('path');
+    const ext = document.getElementById('ext');
+    const overflow = document.getElementById('overflow-display');
+    const enterBtn = document.getElementById('enter-btn');
+    
+    let isEditing = false;
+
+    function cleanText(text) {
+        return text.replace(/[\n\r]/g, '').trim();
+    }
+
+    function updateDisplay() {
+        const sText = cleanText(sub.innerText);
+        const pText = cleanText(path.innerText);
+        const total = sText.length + pText.length;
+
+        if (total > 8 || sText.length > 5) {
+            sub.style.maxWidth = '5ch';
+            let pathMax = Math.max(2, 8 - Math.min(sText.length, 5));
+            path.style.maxWidth = pathMax + 'ch';
+
+            if (isEditing) {
+                overflow.style.visibility = 'visible';
+                overflow.innerText = `${sText}.1337.${ext.value}/${pText}`;
+            } else {
+                overflow.style.visibility = 'hidden';
+            }
+        } else {
+            sub.style.maxWidth = 'none';
+            path.style.maxWidth = 'none';
+            overflow.style.visibility = 'hidden';
+        }
+    }
+
+    [sub, path].forEach(el => {
+        el.addEventListener('input', updateDisplay);
+        el.addEventListener('focus', () => { isEditing = true; updateDisplay(); });
+        el.addEventListener('blur', () => { isEditing = false; updateDisplay(); });
+        
+        el.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                enterBtn.click();
+            }
+        });
+    });
+
+    ext.addEventListener('change', updateDisplay);
+    ext.addEventListener('focus', () => { isEditing = true; updateDisplay(); });
+    ext.addEventListener('blur', () => { isEditing = false; updateDisplay(); });
+
+    enterBtn.addEventListener('click', () => {
+        const sText = cleanText(sub.innerText) || "www";
+        const pText = cleanText(path.innerText);
+        const fullUrl = `https://${sText}.1337.${ext.value}/${pText}`;
+        
+        if (confirm(`Go to ∆\\${sText}.1337.${ext.value}/${pText}?`)) {
+            window.open(fullUrl, '_blank');
+        }
+    });
+
+    updateDisplay();
+</script>
+
+</body>
+</html>
